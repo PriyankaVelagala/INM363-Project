@@ -1,7 +1,12 @@
 import gym
 import random
 import time
+
+import matplotlib.pyplot as plt
+
 import vizdoom_gym.envs.VizDoomEnv
+import PIL.Image as Image
+
 import helper_fuctions as helper
 
 
@@ -24,6 +29,14 @@ if __name__ == "__main__":
         action = helper.random_action(env)
         ob, reward, done, info = env.step(action)
         # print("Total Reward:", reward)
+
+        """
+        if info["StateNum"] == 82:
+            plt.imshow(ob)
+            plt.show()
+            time.sleep(10)
+            break
+        """
 
         if len(info) > 0:
             path.append((info["X"], info["Y"]))

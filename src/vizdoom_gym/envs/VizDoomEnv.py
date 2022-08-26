@@ -14,10 +14,8 @@ ICM: https://github.com/pathak22/noreward-rl/blob/master/doomFiles/doom_env.py
 VizDoom Gym: https://github.com/shakenes/vizdoomgym/blob/master/vizdoomgym/envs/vizdoomenv.py
 Gym Doom: https://github.com/MarvineGothic/gym_doom/tree/5cda5bbb52c0e82e9fd2ed355d2c7e84c767603b
 """
+
 # use synchronous modes: PLAYER(agent)/SPECTATOR(human) (similar to ICM paper)
-
-
-
 # TODO: print observations
 # TODO: render method
 # TODO: low priority: record screen
@@ -43,8 +41,8 @@ class VizdoomEnv(gym.Env):
     def __init__(self, level, **kwargs):
         # get keyword args to initialize env
         self.mode = kwargs.get("mode", "SPECTATOR")
-        self.config_file = kwargs.get("config_file", False)
-        self.scenario_file = kwargs.get("scenario_file", False)
+        self.config_file = "custom\\very_dense_reward.cfg" #kwargs.get("config_file", False)
+        self.scenario_file = "custom\\very_dense_reward.wad" #kwargs.get("scenario_file", False)
         # self.training = kwargs.get("training", False)
 
         # store last shaping reward
@@ -52,7 +50,7 @@ class VizdoomEnv(gym.Env):
         # frame repeat
         self.frame_repeat = 4
         # force mode to algo for now
-        self.mode = 'human'
+        self.mode = 'algo'
 
         # initialize game instance
         self.game = vzd.DoomGame()
@@ -70,7 +68,7 @@ class VizdoomEnv(gym.Env):
             raise NotImplementedError
 
         # change this for training/testing
-        self.game.set_window_visible(True)
+        self.game.set_window_visible(False)
         self.game.init()
 
         self.state = None
@@ -87,7 +85,8 @@ class VizdoomEnv(gym.Env):
                                             high=255,
                                             shape=(self.game.get_screen_height(),
                                                    self.game.get_screen_width(),
-                                                   self.game.get_screen_channels()))
+                                                   self.game.get_screen_channels()),
+                                            dtype=np.uint8)
 
     def step(self, action):
         # convert action to vizdoom action space (one hot)
@@ -139,7 +138,8 @@ class VizdoomEnv(gym.Env):
         # might not need to do this
         self.last_shaping_reward = 0
         self.state = self.game.get_state()
-        return self.state
+        return np.transpose(self.state.screen_buffer, (1, 2, 0))
+        # self.state.screen_buffer
 
     def render(self, mode="algo"):
         img = self.game.get_state().screen_buffer.copy()

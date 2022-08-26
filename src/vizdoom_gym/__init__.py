@@ -7,5 +7,6 @@ register(
 
 register(
     id='VizDoomVeryDenseReward-v0',
-    entry_point='vizdoom_gym.envs:VizDoomVeryDenseReward'
+    entry_point='vizdoom_gym.envs:VizDoomVeryDenseReward',
+    max_episode_steps=350,
 )

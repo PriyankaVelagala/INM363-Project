@@ -4,9 +4,12 @@ import vizdoom as vzd
 from pathlib import Path
 from matplotlib import pyplot as plt
 
-CONFIG_DIR = "C:\\Users\\priya\\OneDrive - City, University of London\\Documents\\GitHub\\INM363-Project\\scenarios\\"
-CONFIG_FILE = "custom\\very_dense_reward.cfg"
-SCENARIO_FILE = "custom\\very_dense_reward.wad"
+CONFIG_DIR = "/content/drive/MyDrive/GitHub/INM363-Project/scenarios"
+#"C:\\Users\\priya\\OneDrive - City, University of London\\Documents\\GitHub\\INM363-Project\\scenarios\\"
+CONFIG_FILE = "custom/very_dense_reward.cfg"
+#"custom\\very_dense_reward.cfg"
+SCENARIO_FILE = "custom/test/dense_reward_fixed_start.wad"
+#"custom\\very_dense_reward.wad"
 
 DEBUG = True
 
@@ -32,10 +35,15 @@ def print_metadata(info):
 def get_env_layout(config=CONFIG_FILE, scenario=SCENARIO_FILE):
     config_path = Path(CONFIG_DIR, config)
     scenario_path = Path(CONFIG_DIR, scenario)
+    if DEBUG:
+        print("Config file path:", config_path)
+        print("Scenario path:", scenario_path)
     game = vzd.DoomGame()
     game.load_config(config_path.as_posix())
     game.set_doom_scenario_path(scenario_path.as_posix())
     game.set_mode(vzd.Mode.SPECTATOR)
+    game.set_objects_info_enabled(True)
+    game.set_sectors_info_enabled(True)
     game.set_window_visible(False)
     game.init()
 
@@ -47,6 +55,7 @@ def get_env_layout(config=CONFIG_FILE, scenario=SCENARIO_FILE):
     state = game.get_state()
 
     for o in state.objects:
+        #print(o.name)
         if o.name == "HealthBonus":
             health_pos.append((o.position_x, o.position_y))
         elif o.name == "GreenArmor":

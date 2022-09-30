@@ -14,9 +14,9 @@ if __name__ == "__main__":
 
     sectors, health_pos, armor_pos = helper.get_env_layout()
 
-    env = gym.make('VizDoomVeryDenseReward-v0',
-                   config_file="custom\\very_dense_reward.cfg",
-                   scenario_file="custom\\very_dense_reward.wad")
+    env = gym.make('VizDoomVeryDenseReward-v0')
+#                   config_file="custom\\very_dense_reward.cfg",
+#                   scenario_file="custom\\very_dense_reward.wad")
 
     obs = env.reset()
 

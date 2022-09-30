@@ -1,6 +1,5 @@
 import gym
 from gym import spaces
-# from gym.envs.classic_control import rendering
 import vizdoom as vzd
 from pathlib import Path
 import numpy as np
@@ -8,43 +7,29 @@ import multiprocessing
 
 """
 sources:
-- Using PyDoom
 ICM: https://github.com/pathak22/noreward-rl/blob/master/doomFiles/doom_env.py
-- Using VizDoom 
 VizDoom Gym: https://github.com/shakenes/vizdoomgym/blob/master/vizdoomgym/envs/vizdoomenv.py
 Gym Doom: https://github.com/MarvineGothic/gym_doom/tree/5cda5bbb52c0e82e9fd2ed355d2c7e84c767603b
 """
 
-# use synchronous modes: PLAYER(agent)/SPECTATOR(human) (similar to ICM paper)
-# TODO: print observations
-# TODO: render method
-# TODO: low priority: record screen
-# TODO: check if lock needed for multiprocessing
-# TODO: frame stacking?
-
-# TODO: add data structures to store sector/armor/health kit position - need to do this in a seperate helper class? -- DONE
-# TODO: add data structure to store agent path traversal for one episode? - not sure how this would work? --DONE
-# TODO: check if reset method needs a return value -- DONE
-
-
-CONFIG_DIR = "C:\\Users\\priya\\OneDrive - City, University of London\\Documents\\GitHub\\INM363-Project\\scenarios\\"
+CONFIG_DIR = "/content/drive/MyDrive/GitHub/INM363-Project/scenarios"
+#"C:\\Users\\priya\\OneDrive - City, University of London\\Documents\\GitHub\\INM363-Project\\scenarios\\"
 
 CONFIGS = [
     ["default\\my_way_home.cfg", 5],  # level 0
-    ["custom\\very_dense_reward.cfg", 3]  # level 1
+    ["custom\\custom_config.cfg", 3]  # level 1
 ]
 
-DEBUG = True
+DEBUG = False
 
 
 class VizdoomEnv(gym.Env):
     def __init__(self, level, **kwargs):
         # get keyword args to initialize env
         self.mode = kwargs.get("mode", "SPECTATOR")
-        self.config_file = "custom\\very_dense_reward.cfg" #kwargs.get("config_file", False)
-        self.scenario_file = "custom\\very_dense_reward.wad" #kwargs.get("scenario_file", False)
-        # self.training = kwargs.get("training", False)
-
+        self.config_file = "custom/custom_config.cfg" #kwargs.get("config_file", False)
+        self.scenario_file = "icm/my_way_home_verySparse.wad"  #kwargs.get("scenario_file", False)
+        
         # store last shaping reward
         self.last_shaping_reward = 0
         # frame repeat
@@ -59,6 +44,8 @@ class VizdoomEnv(gym.Env):
             print(f"scenario file: {Path(CONFIG_DIR, self.scenario_file).as_posix()}")
         self.game.load_config(Path(CONFIG_DIR, self.config_file).as_posix())
         self.game.set_doom_scenario_path(Path(CONFIG_DIR, self.scenario_file).as_posix())
+        
+        
         # set mode
         if self.mode == 'algo':
             self.game.set_mode(vzd.Mode.PLAYER)
@@ -66,6 +53,19 @@ class VizdoomEnv(gym.Env):
             self.game.set_mode(vzd.Mode.SPECTATOR)
         else:
             raise NotImplementedError
+            
+            
+        #might need to increase this 
+        eps_timeout = 800 #400#800#1600 #800 = ~ 200 actions #1600 #400 = 100 actions | 200 = ~ 50 actions | 100 = 25 (*4) steps 
+        self.game.set_episode_timeout(eps_timeout)
+        # 100 + 4 frame repeat = max. 25 actions/steps per episode 
+        self.game.set_screen_resolution(vzd.ScreenResolution.RES_320X240)
+
+        if DEBUG:
+            print(f"episode timeout: {eps_timeout}")
+            print(f"screen resolution: 320X240")
+        
+     
 
         # change this for training/testing
         self.game.set_window_visible(False)
